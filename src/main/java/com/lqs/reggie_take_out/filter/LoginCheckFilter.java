@@ -1,6 +1,7 @@
 package com.lqs.reggie_take_out.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.lqs.reggie_take_out.common.BaseContext;
 import com.lqs.reggie_take_out.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
@@ -47,6 +48,8 @@ public class LoginCheckFilter implements Filter {
 
         // 4、判断登录状态，如果已经登录，则放行
         if (request.getSession().getAttribute("employee")!=null){
+            Long empId = (Long) request.getSession().getAttribute("employee");
+            BaseContext.setCurrentId(empId);
             filterChain.doFilter(request,response);
             return;
         }
