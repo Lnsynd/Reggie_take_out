@@ -1,12 +1,16 @@
 package com.lqs.reggie_take_out.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lqs.reggie_take_out.common.R;
 import com.lqs.reggie_take_out.entity.Category;
 import com.lqs.reggie_take_out.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 分类管理
@@ -73,5 +77,20 @@ public class CategoryController {
     public R<String> update(@RequestBody Category category){
         categoryService.updateById(category);
         return R.success("修改成功!");
+    }
+
+
+    /**
+     * 条件查询分类数据
+     * @param category
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Category>> list(Category category){
+        LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(ObjectUtils.isNotNull(category.getType()),Category::getType,category.getType());
+        lambdaQueryWrapper.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
+        List<Category> list = categoryService.list(lambdaQueryWrapper);
+        return R.success(list);
     }
 }
