@@ -55,11 +55,11 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         BeanUtils.copyProperties(dish,dishDto);
 
         // 从flavor表查询菜品对应的口味信息
-        LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(DishFlavor::getDishId,dish.getId());
-        List<DishFlavor> flavors = dishFlavorService.list(queryWrapper);
-
-        dishDto.setFlavors(flavors);
+//        LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
+//        queryWrapper.eq(DishFlavor::getDishId,dish.getId());
+//        List<DishFlavor> flavors = dishFlavorService.list(queryWrapper);
+//
+//        dishDto.setFlavors(flavors);
         return dishDto;
     }
 
@@ -79,6 +79,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             item.setDishId(dishDto.getId());
             return item;
         })).collect(Collectors.toList());
+
         dishFlavorService.saveBatch(flavors);
     }
 }
