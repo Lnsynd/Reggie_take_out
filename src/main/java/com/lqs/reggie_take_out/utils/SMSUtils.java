@@ -12,12 +12,12 @@ import com.google.gson.Gson;
 public class SMSUtils {
 
     public static void sendMessage(String signName, String templateCode,String phoneNumbers,String param) {
-        DefaultProfile profile = DefaultProfile.getProfile("cn-beijing", "LTAI5tPxpTpA5D5jk67PCoN4", "jNf1tIUIszqWFLLkunwNLT2L2XTHVc");
+        DefaultProfile profile = DefaultProfile.getProfile("cn-beijing", "", "");
         /** use STS Token
          DefaultProfile profile = DefaultProfile.getProfile(
          "<your-region-id>",           // The region ID
-         "<your-access-key-id>",       // The AccessKey ID of the RAM account
-         "<your-access-key-secret>",   // The AccessKey Secret of the RAM account
+         "<your-access-key-id>",       // The AccessKey ID of the RAM account <LTAI5tPxpTpA5D5jk67PCoN4>
+         "<your-access-key-secret>",   // The AccessKey Secret of the RAM account <jNf1tIUIszqWFLLkunwNLT2L2XTHVc>
          "<your-sts-token>");          // STS Token
          **/
         IAcsClient client = new DefaultAcsClient(profile);
