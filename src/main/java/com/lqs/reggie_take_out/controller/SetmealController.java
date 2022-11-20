@@ -7,6 +7,7 @@ import com.lqs.reggie_take_out.common.R;
 import com.lqs.reggie_take_out.dto.SetmealDto;
 import com.lqs.reggie_take_out.entity.Category;
 import com.lqs.reggie_take_out.entity.Setmeal;
+import com.lqs.reggie_take_out.entity.SetmealDish;
 import com.lqs.reggie_take_out.service.CategoryService;
 import com.lqs.reggie_take_out.service.SetmealDishService;
 import com.lqs.reggie_take_out.service.SetmealService;
@@ -133,5 +134,34 @@ public class SetmealController {
     public R<String> update(@RequestBody SetmealDto setmealDto){
         setmealService.updateWithDishes(setmealDto);
         return R.success("修改成功!");
+    }
+
+
+    @GetMapping("/list")
+    public R<List<SetmealDto>> list(Setmeal setmeal){
+        LambdaQueryWrapper<Setmeal> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Setmeal::getCategoryId,setmeal.getCategoryId());
+        lambdaQueryWrapper.eq(Setmeal::getStatus,setmeal.getStatus());
+        lambdaQueryWrapper.orderByDesc(Setmeal::getUpdateTime);
+        List<Setmeal> list = setmealService.list(lambdaQueryWrapper);
+
+        log.info("套餐信息:{}",list);
+
+        List<SetmealDto> setmealDtoList = list.stream().map((item) -> {
+            SetmealDto setmealDto = new SetmealDto();
+
+            BeanUtils.copyProperties(item, setmealDto);
+
+            // 查询该id的套餐中 含有的 菜品
+            LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(SetmealDish::getSetmealId, item.getId());
+            List<SetmealDish> setmealDishes = setmealDishService.list(queryWrapper);
+            log.info("套餐中菜品信息为：{}",setmealDishes);
+            setmealDto.setSetmealDishes(setmealDishes);
+
+            return setmealDto;
+        }).collect(Collectors.toList());
+
+        return R.success(setmealDtoList);
     }
 }
