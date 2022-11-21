@@ -117,4 +117,15 @@ public class AddressBookController {
         addressBookService.removeById(ids);
         return R.success("删除成功");
     }
+
+
+
+    @GetMapping("/default")
+    public R<AddressBook> getDefault(){
+        LambdaQueryWrapper<AddressBook> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(AddressBook::getUserId,BaseContext.getCurrentId());
+
+        AddressBook addressBook = addressBookService.getOne(lambdaQueryWrapper);
+        return R.success(addressBook);
+    }
 }
