@@ -15,6 +15,7 @@ import com.lqs.reggie_take_out.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -103,7 +104,6 @@ public class DishController {
         dishService.saveWithFlavor(dishDto);
         return R.success("添加成功");
     }
-
 
     /**
      * 回显，得到菜品信息

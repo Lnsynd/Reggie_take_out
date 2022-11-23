@@ -14,6 +14,8 @@ import com.lqs.reggie_take_out.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,6 +43,7 @@ public class SetmealController {
      * @return
      */
     @PostMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> save(@RequestBody SetmealDto setmealDto) {
         setmealService.saveWithDish(setmealDto);
         return R.success("保存成功");
@@ -86,10 +89,12 @@ public class SetmealController {
 
     /**
      * 删除套餐
+     *
      * @param ids
      * @return
      */
     @DeleteMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> delete(@RequestParam List<Long> ids) {
         setmealService.removeWithDish(ids);
         return R.success("删除成功!");
@@ -98,12 +103,13 @@ public class SetmealController {
 
     /**
      * 修改售卖状态
+     *
      * @param status
      * @param ids
      * @return
      */
     @PostMapping("/status/{status}")
-    public R<String> changeStatus(@PathVariable Integer status,@RequestParam List<Long> ids){
+    public R<String> changeStatus(@PathVariable Integer status, @RequestParam List<Long> ids) {
         List<Setmeal> setmeals = ids.stream().map((item) -> {
             Setmeal setmeal = setmealService.getById(item);
             setmeal.setStatus(status);
@@ -115,11 +121,12 @@ public class SetmealController {
 
     /**
      * 套餐信息回显
+     *
      * @param id
      * @return
      */
     @GetMapping("/{id}")
-    public R<SetmealDto> get(@PathVariable Long id){
+    public R<SetmealDto> get(@PathVariable Long id) {
         SetmealDto setmealDto = setmealService.getByIdWithDish(id);
         return R.success(setmealDto);
     }
@@ -127,25 +134,27 @@ public class SetmealController {
 
     /**
      * 修改套餐信息
+     *
      * @param setmealDto
      * @return
      */
     @PutMapping
-    public R<String> update(@RequestBody SetmealDto setmealDto){
+    public R<String> update(@RequestBody SetmealDto setmealDto) {
         setmealService.updateWithDishes(setmealDto);
         return R.success("修改成功!");
     }
 
 
     @GetMapping("/list")
-    public R<List<SetmealDto>> list(Setmeal setmeal){
+    @Cacheable(value = "setmealCache", key = "#setmeal.categoryId+'_'+ #setmeal.status")
+    public R<List<SetmealDto>> list(Setmeal setmeal) {
         LambdaQueryWrapper<Setmeal> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(Setmeal::getCategoryId,setmeal.getCategoryId());
-        lambdaQueryWrapper.eq(Setmeal::getStatus,setmeal.getStatus());
+        lambdaQueryWrapper.eq(Setmeal::getCategoryId, setmeal.getCategoryId());
+        lambdaQueryWrapper.eq(Setmeal::getStatus, setmeal.getStatus());
         lambdaQueryWrapper.orderByDesc(Setmeal::getUpdateTime);
         List<Setmeal> list = setmealService.list(lambdaQueryWrapper);
 
-        log.info("套餐信息:{}",list);
+        log.info("套餐信息:{}", list);
 
         List<SetmealDto> setmealDtoList = list.stream().map((item) -> {
             SetmealDto setmealDto = new SetmealDto();
@@ -156,7 +165,7 @@ public class SetmealController {
             LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(SetmealDish::getSetmealId, item.getId());
             List<SetmealDish> setmealDishes = setmealDishService.list(queryWrapper);
-            log.info("套餐中菜品信息为：{}",setmealDishes);
+            log.info("套餐中菜品信息为：{}", setmealDishes);
             setmealDto.setSetmealDishes(setmealDishes);
 
             return setmealDto;
