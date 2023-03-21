@@ -15,7 +15,6 @@ import com.lqs.reggie_take_out.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -147,7 +146,7 @@ public class DishController {
         List<DishDto> dishDtoList = null;
         String key = "dish_"+dish.getCategoryId()+"_"+dish.getStatus();
 
-        // 先从redis中获取数据
+        // 先从redis中获取缓存数据
         dishDtoList = (List<DishDto>) redisTemplate.opsForValue().get(key);
 
         // 如果存在 则直接返回数据
